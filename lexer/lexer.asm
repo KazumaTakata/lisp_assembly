@@ -55,82 +55,6 @@ _init_Lexer:
     ret
         
 
-print_Token:
-
-    push rbp
-    mov  rbp, rsp
-    sub  rsp, 16
-
-
-    mov rax, qword [rdi+Token.type]
-
-
-    cmp rax, RPAREN 
-    jne _print_else1
-
-
-    lea  rdi, [lparen]
-    xor  rax, rax
-    call  _printf
-    
-    jmp _print_fi
-
-
-_print_else1:
-
-
-    cmp rax, LPAREN
-    jne _print_else2
- 
-
-
-    lea  rdi, [rparen]
-    xor  rax, rax
-    call  _printf
-    
-    jmp _print_fi
-
-
-
-_print_else2:
-
-    cmp rax, NUMBER
-    jne _print_else3
- 
-
-
-    lea  rdi, [number]
-    xor  rax, rax
-    call  _printf
-    
-    jmp _print_fi
-
-
-_print_else3:
-
-    cmp rax, PLUS
-    jne _print_else4
- 
-
-
-    lea  rdi, [plus]
-    xor  rax, rax
-    call  _printf
-    
-    jmp _print_fi
-
-
-_print_else4:
-
-_print_fi:
-
- 
-    leave
-    ret
-
-
-
-
 
 
 
@@ -140,16 +64,24 @@ get_Token:
 
     push rbp
     mov  rbp, rsp
-    sub  rsp, 16
-
-    xor rbx, rbx
-
-    mov rax, [rdi+Lexer.value]
-    mov rcx, [rdi+Lexer.pos]
-
-    mov bl, byte [rax+rcx]
+    sub  rsp, 32
 
     mov [rsp+0], rdi
+
+    mov rdi, 1000
+    mov rsi, 8
+    call _calloc
+    mov [rsp+16], rax
+
+
+
+    ;get current char
+    mov rdi, [rsp+0]
+    mov rax, [rdi+Lexer.value]
+    mov rcx, [rdi+Lexer.pos]
+    xor rbx, rbx
+    mov bl, byte [rax+rcx]
+
 
 
 ;switch 
@@ -164,11 +96,19 @@ begin:
     ;xor  rax, rax
     ;call  _printf
 
+    mov rax, [rsp+16]
+    mov byte [rax], bl 
+    
+
     mov  rdi, LPAREN
     mov  sil, '('
     call _init_Token
 
     mov [rsp+8], rax
+    
+    mov rcx, [rsp+8]
+    mov rax, [rsp+16]
+    mov [rcx+Token.value], rax
 
     jmp  _fi
 
@@ -179,6 +119,9 @@ _else1:
     jne _else2
 
  
+    mov rax, [rsp+16]
+    mov byte [rax], bl 
+
     ;lea  rdi, [rparen]
     ;xor  rax, rax
     ;call  _printf
@@ -191,7 +134,12 @@ _else1:
     mov [rsp+8], rax
 
 
+    
+    mov rcx, [rsp+8]
+    mov rax, [rsp+16]
+    mov [rcx+Token.value], rax
 
+ 
 
 
     jmp  _fi
@@ -205,7 +153,9 @@ _else2:
     cmp bl, '9'
     jg _else3
 
-
+ 
+    mov rax, [rsp+16]
+    mov byte [rax], bl 
  
 ;    lea  rdi, [number]
     ;xor  rax, rax
@@ -217,7 +167,12 @@ _else2:
 
     mov [rsp+8], rax
 
+    
+    mov rcx, [rsp+8]
+    mov rax, [rsp+16]
+    mov [rcx+Token.value], rax
 
+ 
 
     jmp  _fi
 
@@ -253,6 +208,9 @@ _else4:
     cmp bl, '+'
     jne _else5
 
+  
+    mov rax, [rsp+16]
+    mov byte [rax], bl 
  
     ;lea  rdi, [plus]
     ;xor  rax, rax
@@ -263,7 +221,12 @@ _else4:
     call _init_Token
 
     mov [rsp+8], rax
+    
+    mov rcx, [rsp+8]
+    mov rax, [rsp+16]
+    mov [rcx+Token.value], rax
 
+ 
 
     jmp  _fi
 
@@ -279,7 +242,7 @@ _fi:
     inc rax
     mov [rdi+Lexer.pos], rax
 
-
+    ;return token
     mov rax, [rsp+8]
 
     leave

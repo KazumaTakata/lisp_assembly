@@ -10,7 +10,7 @@
 
 
 string: db "(+ 5 3)", 0
-;format: db "%c",10,0
+message: db "helloworld",10,0
 
 lexer equ 0
 
@@ -41,13 +41,14 @@ _main:
 
 _loop:
 
-
     mov rdi, qword [rsp+lexer]
-    ;call get_Token
-    ;mov rdi, rax
-
     call _parse_Expr
 
+
+
+    ;mov rdi, qword [rsp+lexer]
+    ;call get_Token
+    ;mov rdi, rax
     ;call print_Token
  
 
@@ -57,8 +58,8 @@ _loop:
     ;xor  rax, rax
     ;call  _printf
 
-    mov rax, qword [rsp + lexer]   
-    mov rcx, qword [rax + Lexer.pos]
+    ;mov rax, qword [rsp + lexer]   
+    ;mov rcx, qword [rax + Lexer.pos]
 
     ;cmp rcx, 7 
     ;jne _loop

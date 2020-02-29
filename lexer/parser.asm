@@ -1,12 +1,14 @@
 
+    extern _atoi
+
 
     section .data
 
 
     struc expr_Node
 .op       resq 1
-.operand1 resb 1
-.operand2 resb 1
+.operand1 resq 1
+.operand2 resq 1
     endstruc
 
 
@@ -14,7 +16,11 @@
     section .text
 
 error_format: db "parser error %c", 10, 0
-sample: db "sample message"
+sample: db "sample message", 10, 0
+string_message: db "string is %s", 10, 0
+int_message: db "int value is %d", 10, 0
+
+
 _parse_Expr:
 
     push rbp
@@ -28,6 +34,7 @@ _parse_Expr:
     call _malloc
     mov [rsp+8], rax
 
+      
 
 
 
@@ -42,11 +49,18 @@ _parse_Expr:
     ;eat ( 
     cmp rax, LPAREN 
     jne _parse_Error
-    
- 
+   
+
     ;get token
     mov rdi, [rsp+0]
     call get_Token
+  
+
+    ;mov rdi, rax
+    ;mov rax, qword [rdi+Token.value]
+    ;lea rdi, [string_message]
+    ;mov rsi, rax
+    ;call _printf
 
  
     mov rdi, rax
@@ -61,8 +75,6 @@ _parse_Expr:
     jmp _op_fi
 
 _minus_op:
- 
-
 
     cmp rax, MINUS
     jne _mul_op
@@ -73,10 +85,13 @@ _minus_op:
     
     jmp _op_fi
 
+   
 
 
 _mul_op:
  
+
+
     cmp rax, MULTI
     jne _parse_Error 
 
@@ -87,12 +102,62 @@ _mul_op:
 
 
 _op_fi:
+
+
+    ;get token
+    mov rdi, [rsp+0]
+    call get_Token
+
+
+    mov rdi, rax
+    mov rax, qword [rdi+Token.type]
+    ;assert number
+    cmp rax, NUMBER 
+    jne _parse_Error
+
+
+    mov rax, qword [rdi+Token.value]
+    mov rdi, rax
+    call _atoi    
+ 
+    mov rcx, [rsp+8]
+    mov qword [rcx+expr_Node.operand1], rax
+    
+ 
+
+    mov rsi, qword [rcx+expr_Node.operand1]
+    lea rdi, [int_message] 
+    call _printf
+
+
+    
+
+    ;get token
+    mov rdi, [rsp+0]
+    call get_Token
+
+
+    mov rdi, rax
+    mov rax, qword [rdi+Token.type]
+    ;assert number
+    cmp rax, NUMBER 
+    jne _parse_Error
+
+
+    mov rax, qword [rdi+Token.value]
+    mov rdi, rax
+    call _atoi    
+ 
+    mov rcx, [rsp+8]
+    mov qword [rcx+expr_Node.operand2], rax
+
+
+    mov rsi, qword [rcx+expr_Node.operand2]
+    lea rdi, [int_message] 
+    call _printf
+
+
     ;return expr_Node
-
-
-
-
-
     mov rax, [rsp+8]
 
     leave
@@ -103,10 +168,6 @@ _parse_Error:
 
 
     lea  rdi, [error_format]
-
-    mov  rcx, [rsp+0]
-
-    mov  sil, [rcx+Token.value]
     xor  rax, rax
     call  _printf
 
