@@ -36,7 +36,7 @@ plus: db " <PLUS> ", 0
 _init_Lexer:
     push    rbp
     mov     rbp, rsp
-    sub     rsp, 16 
+    sub     rsp, 32
 
     mov [rsp + 0], rdi
     mov [rsp + 8], rsi 
@@ -152,19 +152,56 @@ _else2:
  
     mov rax, [rsp+16]
     mov byte [rax], bl 
+
+    mov qword [rsp+24], 1
+    
+
+number_loop:
+
+    
+    mov rdi, [rsp+0]
+    mov rax, [rdi+Lexer.value]
+    mov rcx, [rdi+Lexer.pos]
+    mov bl, byte [rax+rcx+1]
+
+    cmp bl, '0'
+    jl number_loop_end 
+
+    cmp bl, '9'
+    jg number_loop_end
+
+
+    mov rcx, [rsp+24]
+    mov rax, [rsp+16]
+    mov byte [rax+rcx], bl 
+
+    inc rcx
+    mov [rsp+24], rcx 
+
  
-;    lea  rdi, [number]
-    ;xor  rax, rax
-    ;call  _printf
+    mov rdi, [rsp+0]
+    ;increment pos
+    mov rax, [rdi+Lexer.pos]
+    inc rax
+    mov [rdi+Lexer.pos], rax
+
+
+
+    jmp number_loop
+
+
+number_loop_end:
+    
+  
+
+
+
+ 
 
     mov  rdi, NUMBER
-    mov  rsi, rax 
+    mov  rsi, [rsp+16]
     call _init_Token
     mov [rsp+8], rax
-
-    ;mov rcx, [rsp+8]
-    ;mov rax, [rsp+16]
-    ;mov [rcx+Token.value], rax
 
  
 

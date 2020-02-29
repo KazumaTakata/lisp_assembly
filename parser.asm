@@ -55,13 +55,6 @@ _parse_Expr:
     mov rdi, [rsp+0]
     call get_Token
   
-
-    ;mov rdi, rax
-    ;mov rax, qword [rdi+Token.value]
-    ;lea rdi, [string_message]
-    ;mov rsi, rax
-    ;call _printf
-
  
     mov rdi, rax
     mov rax, qword [rdi+Token.type]
