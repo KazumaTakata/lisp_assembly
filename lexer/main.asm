@@ -9,8 +9,16 @@
 
 
 string: db "(+ 5 3)", 0
+;format: db "%c",10,0
 
-i equ 0
+lexer equ 0
+
+    ;lea rdi, [format]
+    ;mov sil, bl 
+    ;xor  rax, rax
+    ;call  _printf
+
+
 
 
 
@@ -21,22 +29,33 @@ _main:
 
     mov  al, byte [string]
 
-    mov  rax, 0 
-    mov  qword [rsp+i], rax
+
+    lea rdi, [string]
+    mov rsi, 0
+
+
+    call _init_Lexer
+
+    mov  qword [rsp+lexer], rax
 
 _loop:
 
 
-
-    lea rdi, [string]
-    mov rsi, [rsp+i]
+    mov rdi, qword [rsp+lexer]
     call get_Token
+ 
+    lea rdi, [format]
+    mov sil, byte [rax + Token.value] 
+    xor  rax, rax
+    call  _printf
 
-    mov rax, qword [rsp+i]   
-    inc rax
-    mov qword [rsp+i], rax
 
-    cmp rax, 7 
+
+
+    mov rax, qword [rsp + lexer]   
+    mov rcx, qword [rax + Lexer.pos]
+
+    cmp rcx, 7 
     jne _loop
 
 
