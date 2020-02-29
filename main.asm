@@ -5,11 +5,12 @@
 
 %include "lexer.asm"
 %include "parser.asm"
+%include "eval.asm"
 
     section .text
 
 
-string: db "(+ 5 3)", 0
+string: db "(- 5 9)", 0
 message: db "helloworld",10,0
 
 lexer equ 0
@@ -43,6 +44,10 @@ _loop:
 
     mov rdi, qword [rsp+lexer]
     call _parse_Expr
+
+    mov rdi, rax
+
+    call _eval_Expr
 
 
 

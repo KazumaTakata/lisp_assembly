@@ -101,14 +101,13 @@ begin:
     
 
     mov  rdi, LPAREN
-    mov  sil, '('
+    mov  rsi, rax
     call _init_Token
-
     mov [rsp+8], rax
-    
-    mov rcx, [rsp+8]
-    mov rax, [rsp+16]
-    mov [rcx+Token.value], rax
+
+    ;mov rcx, [rsp+8]
+    ;mov rax, [rsp+16]
+    ;mov [rcx+Token.value], rax
 
     jmp  _fi
 
@@ -128,16 +127,13 @@ _else1:
 
 
     mov  rdi, RPAREN
-    mov  sil, ')'
+    mov  rsi, rax 
     call _init_Token
-
     mov [rsp+8], rax
 
-
-    
-    mov rcx, [rsp+8]
-    mov rax, [rsp+16]
-    mov [rcx+Token.value], rax
+    ;mov rcx, [rsp+8]
+    ;mov rax, [rsp+16]
+    ;mov [rcx+Token.value], rax
 
  
 
@@ -162,15 +158,13 @@ _else2:
     ;call  _printf
 
     mov  rdi, NUMBER
-    mov  sil, bl 
+    mov  rsi, rax 
     call _init_Token
-
     mov [rsp+8], rax
 
-    
-    mov rcx, [rsp+8]
-    mov rax, [rsp+16]
-    mov [rcx+Token.value], rax
+    ;mov rcx, [rsp+8]
+    ;mov rax, [rsp+16]
+    ;mov [rcx+Token.value], rax
 
  
 
@@ -217,20 +211,44 @@ _else4:
     ;call  _printf
 
     mov  rdi, PLUS
-    mov  sil, '+'
+    mov  rsi, rax
     call _init_Token
-
     mov [rsp+8], rax
-    
-    mov rcx, [rsp+8]
-    mov rax, [rsp+16]
-    mov [rcx+Token.value], rax
+
+    ;mov rcx, [rsp+8]
+    ;mov rax, [rsp+16]
+    ;mov [rcx+Token.value], rax
 
  
 
     jmp  _fi
 
 _else5:
+    cmp bl, '-'
+    jne _else6
+
+  
+    mov rax, [rsp+16]
+    mov byte [rax], bl 
+ 
+    ;lea  rdi, [plus]
+    ;xor  rax, rax
+    ;call  _printf
+
+    mov  rdi, MINUS
+    mov  rsi, rax
+    call _init_Token
+    mov [rsp+8], rax
+
+    ;mov rcx, [rsp+8]
+    ;mov rax, [rsp+16]
+    ;mov [rcx+Token.value], rax
+
+ 
+
+    jmp  _fi
+
+_else6:
 
 
 _fi:

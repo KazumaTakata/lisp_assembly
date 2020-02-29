@@ -20,7 +20,7 @@ _init_Token:
     sub     rsp, 16 
 
     mov [rsp + 0], rdi
-    mov [rsp + 8], rdi 
+    mov [rsp + 8], rsi 
 
 
     mov rdi, Token_size
