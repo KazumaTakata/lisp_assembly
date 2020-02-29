@@ -4,6 +4,7 @@
 
 
 %include "lexer.asm"
+%include "parser.asm"
 
     section .text
 
@@ -42,23 +43,29 @@ _loop:
 
 
     mov rdi, qword [rsp+lexer]
-    call get_Token
+    ;call get_Token
+    ;mov rdi, rax
+
+    call _parse_Expr
+
+    ;call print_Token
  
-    lea rdi, [format]
-    mov sil, byte [rax + Token.value] 
-    xor  rax, rax
-    call  _printf
 
 
-
+    ;lea rdi, [format]
+    ;mov sil, byte [rax + Token.value] 
+    ;xor  rax, rax
+    ;call  _printf
 
     mov rax, qword [rsp + lexer]   
     mov rcx, qword [rax + Lexer.pos]
 
-    cmp rcx, 7 
-    jne _loop
+    ;cmp rcx, 7 
+    ;jne _loop
 
 
     xor  rax, rax
     leave
     ret
+
+

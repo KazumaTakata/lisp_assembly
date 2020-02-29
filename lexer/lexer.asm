@@ -15,6 +15,16 @@
 
     section .text
 
+
+LPAREN equ 0
+RPAREN equ 1
+NUMBER equ 2
+PLUS   equ 3
+MINUS  equ 4
+MULTI    equ 5
+
+
+
 format: db "%c", 10, 0
 lparen: db " <LPAREN> ", 0
 rparen: db " <RPAREN> ", 0
@@ -44,6 +54,82 @@ _init_Lexer:
     leave
     ret
         
+
+print_Token:
+
+    push rbp
+    mov  rbp, rsp
+    sub  rsp, 16
+
+
+    mov rax, qword [rdi+Token.type]
+
+
+    cmp rax, RPAREN 
+    jne _print_else1
+
+
+    lea  rdi, [lparen]
+    xor  rax, rax
+    call  _printf
+    
+    jmp _print_fi
+
+
+_print_else1:
+
+
+    cmp rax, LPAREN
+    jne _print_else2
+ 
+
+
+    lea  rdi, [rparen]
+    xor  rax, rax
+    call  _printf
+    
+    jmp _print_fi
+
+
+
+_print_else2:
+
+    cmp rax, NUMBER
+    jne _print_else3
+ 
+
+
+    lea  rdi, [number]
+    xor  rax, rax
+    call  _printf
+    
+    jmp _print_fi
+
+
+_print_else3:
+
+    cmp rax, PLUS
+    jne _print_else4
+ 
+
+
+    lea  rdi, [plus]
+    xor  rax, rax
+    call  _printf
+    
+    jmp _print_fi
+
+
+_print_else4:
+
+_print_fi:
+
+ 
+    leave
+    ret
+
+
+
 
 
 
@@ -78,7 +164,7 @@ begin:
     ;xor  rax, rax
     ;call  _printf
 
-    mov  rdi, 0
+    mov  rdi, LPAREN
     mov  sil, '('
     call _init_Token
 
@@ -98,7 +184,7 @@ _else1:
     ;call  _printf
 
 
-    mov  rdi, 1
+    mov  rdi, RPAREN
     mov  sil, ')'
     call _init_Token
 
@@ -125,7 +211,7 @@ _else2:
     ;xor  rax, rax
     ;call  _printf
 
-    mov  rdi, 2 
+    mov  rdi, NUMBER
     mov  sil, bl 
     call _init_Token
 
@@ -172,7 +258,7 @@ _else4:
     ;xor  rax, rax
     ;call  _printf
 
-    mov  rdi, 3
+    mov  rdi, PLUS
     mov  sil, '+'
     call _init_Token
 
@@ -198,7 +284,6 @@ _fi:
 
     leave
     ret
-
 
 
 
