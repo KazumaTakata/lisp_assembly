@@ -10,7 +10,7 @@
     section .text
 
 
-string: db "(- 50 109)", 0
+string: db "(- (+ 50 4) 109)", 0
 message: db "helloworld",10,0
 
 lexer equ 0

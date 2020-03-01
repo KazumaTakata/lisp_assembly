@@ -2,6 +2,11 @@
     extern _atoi
 
 
+%include "parse_operand.asm"
+%include "parse_op.asm"
+
+
+
     section .data
 
 
@@ -34,120 +39,40 @@ _parse_Expr:
     call _malloc
     mov [rsp+8], rax
 
-      
-
-
-
-    ;get token
+    ;eat (
     mov rdi, [rsp+0]
     call get_Token
-
     mov rdi, rax
-
     mov rax, qword [rdi+Token.type]
-
-    ;eat ( 
     cmp rax, LPAREN 
     jne _parse_Error
    
-
-    ;get token
+    ;parse operator
     mov rdi, [rsp+0]
-    call get_Token
-  
- 
-    mov rdi, rax
-    mov rax, qword [rdi+Token.type]
+    call _parse_Operator
+    mov rcx,  [rsp+8]
+    mov qword [rcx+expr_Node.op], rax
     
-    cmp rax, PLUS 
-    jne _minus_op
-
-    mov rax, [rsp+8]
-    mov qword [rax+expr_Node.op], PLUS
-    
-    jmp _op_fi
-
-_minus_op:
-
-    cmp rax, MINUS
-    jne _mul_op
-
-    mov rax, [rsp+8]
-    mov qword [rax+expr_Node.op], MINUS
-    
-    
-    jmp _op_fi
-
-   
-
-
-_mul_op:
- 
-
-
-    cmp rax, MULTI
-    jne _parse_Error 
-
-    mov rax, [rsp+8]
-    mov qword [rax+expr_Node.op], MULTI
-    
-    jmp _op_fi
-
-
-_op_fi:
-
-
-    ;get token
+    ;parse operand1
     mov rdi, [rsp+0]
-    call get_Token
-
-
-    mov rdi, rax
-    mov rax, qword [rdi+Token.type]
-    ;assert number
-    cmp rax, NUMBER 
-    jne _parse_Error
-
-
-    mov rax, qword [rdi+Token.value]
-    mov rdi, rax
-    call _atoi    
- 
+    call _parse_Operand
     mov rcx, [rsp+8]
     mov qword [rcx+expr_Node.operand1], rax
-    
- 
 
-    mov rsi, qword [rcx+expr_Node.operand1]
-    lea rdi, [int_message] 
-    call _printf
-
-
-    
-
-    ;get token
+    ;parse operand2
     mov rdi, [rsp+0]
-    call get_Token
-
-
-    mov rdi, rax
-    mov rax, qword [rdi+Token.type]
-    ;assert number
-    cmp rax, NUMBER 
-    jne _parse_Error
-
-
-    mov rax, qword [rdi+Token.value]
-    mov rdi, rax
-    call _atoi    
- 
+    call _parse_Operand
     mov rcx, [rsp+8]
     mov qword [rcx+expr_Node.operand2], rax
 
 
-    mov rsi, qword [rcx+expr_Node.operand2]
-    lea rdi, [int_message] 
-    call _printf
+    ;eat )
+    mov rdi, [rsp+0]
+    call get_Token
+    mov rdi, rax
+    mov rax, qword [rdi+Token.type]
+    cmp rax, RPAREN 
+    jne _parse_Error
 
 
     ;return expr_Node

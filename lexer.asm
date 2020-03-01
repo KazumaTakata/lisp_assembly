@@ -55,18 +55,16 @@ _init_Lexer:
     ret
         
 
-
-
-
 ;rdi *Lexer
-
+;rsi if_peek
 get_Token:
 
     push rbp
     mov  rbp, rsp
-    sub  rsp, 32
+    sub  rsp, 48
 
     mov [rsp+0], rdi
+    mov [rsp+40], rsi
 
     mov rdi, 1000
     mov rsi, 8
@@ -82,6 +80,9 @@ get_Token:
     xor rbx, rbx
     mov bl, byte [rax+rcx]
 
+    ;save cur pos
+    mov rcx, [rdi+Lexer.pos]
+    mov qword [rsp+32], rcx
 
 
 ;switch 
@@ -92,10 +93,6 @@ begin:
     cmp bl, '('
     jne _else1
  
-    ;lea  rdi, [lparen]
-    ;xor  rax, rax
-    ;call  _printf
-
     mov rax, [rsp+16]
     mov byte [rax], bl 
     
@@ -104,10 +101,6 @@ begin:
     mov  rsi, rax
     call _init_Token
     mov [rsp+8], rax
-
-    ;mov rcx, [rsp+8]
-    ;mov rax, [rsp+16]
-    ;mov [rcx+Token.value], rax
 
     jmp  _fi
 
@@ -121,21 +114,11 @@ _else1:
     mov rax, [rsp+16]
     mov byte [rax], bl 
 
-    ;lea  rdi, [rparen]
-    ;xor  rax, rax
-    ;call  _printf
-
 
     mov  rdi, RPAREN
     mov  rsi, rax 
     call _init_Token
     mov [rsp+8], rax
-
-    ;mov rcx, [rsp+8]
-    ;mov rax, [rsp+16]
-    ;mov [rcx+Token.value], rax
-
- 
 
 
     jmp  _fi
@@ -191,11 +174,6 @@ number_loop:
 
 
 number_loop_end:
-    
-  
-
-
-
  
 
     mov  rdi, NUMBER
@@ -213,10 +191,6 @@ _else3:
  
     cmp bl, ' '
     jne _else4
-    ;lea  rdi, [space]
-    ;xor  rax, rax
-    ;call  _printf
-
  
     mov rdi, [rsp+0]
    
@@ -243,20 +217,12 @@ _else4:
     mov rax, [rsp+16]
     mov byte [rax], bl 
  
-    ;lea  rdi, [plus]
-    ;xor  rax, rax
-    ;call  _printf
 
     mov  rdi, PLUS
     mov  rsi, rax
     call _init_Token
     mov [rsp+8], rax
 
-    ;mov rcx, [rsp+8]
-    ;mov rax, [rsp+16]
-    ;mov [rcx+Token.value], rax
-
- 
 
     jmp  _fi
 
@@ -267,21 +233,11 @@ _else5:
   
     mov rax, [rsp+16]
     mov byte [rax], bl 
- 
-    ;lea  rdi, [plus]
-    ;xor  rax, rax
-    ;call  _printf
 
     mov  rdi, MINUS
     mov  rsi, rax
     call _init_Token
     mov [rsp+8], rax
-
-    ;mov rcx, [rsp+8]
-    ;mov rax, [rsp+16]
-    ;mov [rcx+Token.value], rax
-
- 
 
     jmp  _fi
 
@@ -296,6 +252,20 @@ _fi:
     mov rax, [rdi+Lexer.pos]
     inc rax
     mov [rdi+Lexer.pos], rax
+
+    mov rcx, [rsp+40]
+    cmp rcx, 1
+
+    jne return
+
+    mov rdi, [rsp+32]
+    mov rsi, [rsp+0]
+    mov [rsi+Lexer.pos], rdi
+
+
+return:
+
+
 
     ;return token
     mov rax, [rsp+8]
