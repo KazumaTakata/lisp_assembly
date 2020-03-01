@@ -18,32 +18,70 @@ _eval_Expr:
     mov rsi, [rcx+operand_Node.type]
     
     cmp rsi, EXPR_NODE
-    jne _eval_Term    
+    jne _eval_Terminal1
 
     mov rdi, [rcx+operand_Node.expr]
     call _eval_Expr
     
     mov [rsp+16], rax
     
+    jmp _eval_operand2
+    
 
-_eval_Term:
+_eval_Terminal1:
 
     mov rax ,[rcx+operand_Node.terminal]
-    mov rdx, [rdi+expr_Node.operand2]
-    mov rcx ,[rdx+operand_Node.terminal]
- 
-    add rcx, rax
+    mov [rsp+16], rax
 
+_eval_operand2:
+
+    mov rdi, [rsp+0]
+    mov rcx, [rdi+expr_Node.operand2] 
+    mov rsi, [rcx+operand_Node.type]
     
-    lea rdi, [eval_message]
-    mov rsi, rcx
-    call _printf
+    cmp rsi, EXPR_NODE
+    jne _eval_Terminal2
 
+    mov rdi, [rcx+operand_Node.expr]
+    call _eval_Expr
+    
+    mov [rsp+24], rax
 
-    jmp _else_eval_fi
+    jmp _eval_binary
+    
 
-_else_eval_fi:
+_eval_Terminal2:
 
+    mov rax ,[rcx+operand_Node.terminal]
+    mov [rsp+24], rax
+
+_eval_binary:
+
+    mov rdi, [rsp+0]
+    mov rcx, [rdi+expr_Node.op] 
+
+    cmp rcx, PLUS
+
+    jne _eval_SUB
+
+    mov rax,[rsp+16]
+    mov rcx,[rsp+24]
+
+    add rax, rcx
+
+    jmp _eval_RETURN
+
+_eval_SUB:
+
+ 
+    mov rax,[rsp+16]
+    mov rcx,[rsp+24]
+
+    sub rax, rcx
+
+  
+
+_eval_RETURN:
 
     leave
     ret

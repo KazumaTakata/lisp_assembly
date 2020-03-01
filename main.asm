@@ -10,17 +10,10 @@
     section .text
 
 
-string: db "(- (+ 50 4) 109)", 0
+string: db "(- (+ 33 4) 109)", 0
 message: db "helloworld",10,0
 
 lexer equ 0
-
-    ;lea rdi, [format]
-    ;mov sil, bl 
-    ;xor  rax, rax
-    ;call  _printf
-
-
 
 
 
@@ -48,6 +41,11 @@ _loop:
     mov rdi, rax
 
     call _eval_Expr
+
+    lea rdi, [eval_message]
+    mov rsi, rax
+
+    call _printf
 
 
 
